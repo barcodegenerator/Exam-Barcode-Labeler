@@ -1,0 +1,82 @@
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+import javax.swing.text.Document;
+
+import net.glxn.qrgen.QRCode;
+import net.glxn.qrgen.image.ImageType;
+
+public class LabelingSystem {
+
+	public static void main(String[] args) throws IOException {
+		Scanner in = new Scanner(System.in);
+
+		System.out.println("Enter a date ('YYMMDD):");
+		String date = in.next();
+		System.out.println("Enter time of day:(A, P, E):");
+		String time = in.next();
+		System.out.println("Enter building code: ");
+		String building = in.next();
+		int seats =0;
+		String room ="";
+		
+		if(building.equals("CH")||building.equals("DH")||building.equals("WLH")||building.equals("IB1")||building.equals("IB2")){
+			System.out.println("Enter room: ");
+			room = in.next();
+			System.out.println("Enter # of seats: ");
+			seats = in.nextInt();
+			for(int i =1;i<seats+1;i++) {
+				String nameOfQr = building+" "+room+"QRCode"+i+".png";
+				String nameOfFolder = "QRCodes";
+				String fileName = "/Users/jessicaomalley/Desktop/"+nameOfFolder+"/"+nameOfQr;
+				String seatNumber = date+time+" "+building+" "+room+"-"+i;
+				generateCode(seatNumber,fileName);
+			}		
+
+		}
+		else if(((building.equals("GH")||building.equals("BG")||building.equals("BWG")||building.equals("RG")))){
+			System.out.println("Enter # of rows: ");
+			int rows = in.nextInt();
+			System.out.println("Enter # of seats per row: ");
+			seats = in.nextInt();
+			for(int r =1;r<rows+1;r++){
+				for(int s = 1;s<seats+1;s++){ 
+					String nameOfFolder = "QRCodes";
+					String nameOfQr = building+" Row:"+r+"-'Seat:"+s+ "QRCode.png";
+					String seatNumber = date+time+" "+building+" "+r+"-"+s;
+					String fileName = "/Users/jessicaomalley/Desktop/"+nameOfFolder+"/"+nameOfQr;
+					generateCode(seatNumber,fileName);
+				}
+			}
+		}
+		else if(building.equals("MH3")|| building.equals("M3X")) {
+			System.out.println("Enter # of seats: ");
+			seats = in.nextInt();
+			for(int i =1;i<seats+1;i++) {
+				String nameOfQr = building+" "+"QRCode"+i+".png";
+				String nameOfFolder = "QRCodes";
+				String fileName = "/Users/jessicaomalley/Desktop/"+nameOfFolder+"/"+nameOfQr;
+				String seatNumber = date+time+" "+building+" "+"-"+i;
+				generateCode(seatNumber,fileName);
+			}		
+		}
+		in.close();
+
+	}
+	public static void generateCode(String information,String fileName) throws IOException {
+		ByteArrayOutputStream out = QRCode.from(information).to(ImageType.PNG).stream();
+
+		File f = new File(fileName);
+		FileOutputStream fos = new FileOutputStream(f);
+
+		fos.write(out.toByteArray());
+		fos.flush();
+		fos.close();
+	}
+}
